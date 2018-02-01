@@ -1,6 +1,7 @@
 package dk.adamino.metronome;
 
 import android.content.Context;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,9 @@ public class MetronomeActivity extends AppCompatActivity {
 
     private BPMCalculator mBPMCalculator;
     private IExpressionService mExpressionService;
+    private SoundPool mSoundPool;
+    private int mSoundId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,11 @@ public class MetronomeActivity extends AppCompatActivity {
         mBPMCalculator = new BPMCalculator();
         mExpressionService = new ExpressionService();
         mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        // Setup SoundPool for beat playback
+        mSoundPool = new SoundPool.Builder()
+                .setMaxStreams(10)
+                .build();
+        mSoundId = mSoundPool.load(this, R.raw.claves, 1);
     }
 
     private void initializeViews() {
@@ -64,6 +73,8 @@ public class MetronomeActivity extends AppCompatActivity {
     private void handleBeat() {
         // Vibrate phone to indicate beat to user
         vibrate();
+        // Play sound on beat
+        mSoundPool.play(mSoundId, 1, 1, 1, 0, 1);
         // Make a record of the beat for BPM calculation
         mBPMCalculator.recordTime();
         updateBPMView();
